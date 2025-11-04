@@ -1,10 +1,8 @@
 package com.example.catalog.web.controllers;
 
-import com.example.catalog.domain.dto.CreateTaskDTO;
 import com.example.catalog.domain.dto.CreateUserDTO;
-import com.example.catalog.domain.entities.Task;
+import com.example.catalog.domain.dto.UpdateUserDTO;
 import com.example.catalog.domain.entities.User;
-import com.example.catalog.services.TaskService;
 import com.example.catalog.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
@@ -43,8 +41,8 @@ public class UserControler {
     }
 
     @PutMapping("/{id}/toggle")
-    public ResponseEntity<User> toggle(@PathVariable(name = "id") Long id) {
-        User toggled = userService.toggle(id);
+    public ResponseEntity<User> toggle(@PathVariable(name = "id") Long id, UpdateUserDTO dto) {
+        User toggled = userService.toggle(id, dto);
         return ResponseEntity.ok(toggled);
     }
 

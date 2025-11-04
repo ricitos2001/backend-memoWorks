@@ -2,6 +2,7 @@ package com.example.catalog.web.controllers;
 
 import com.example.catalog.domain.dto.CreateGroupDTO;
 import com.example.catalog.domain.dto.CreateTaskDTO;
+import com.example.catalog.domain.dto.UpdateGroupDTO;
 import com.example.catalog.domain.entities.Group;
 import com.example.catalog.domain.entities.Task;
 import com.example.catalog.services.GroupService;
@@ -43,8 +44,8 @@ public class GroupControler {
     }
 
     @PutMapping("/{id}/toggle")
-    public ResponseEntity<Group> toggle(@PathVariable(name = "id") Long id) {
-        Group toggled = groupService.toggle(id);
+    public ResponseEntity<Group> toggle(@PathVariable(name = "id") Long id, UpdateGroupDTO dto) {
+        Group toggled = groupService.toggle(id, dto);
         return ResponseEntity.ok(toggled);
     }
 

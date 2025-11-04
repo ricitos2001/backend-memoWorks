@@ -1,6 +1,7 @@
 package com.example.catalog.web.controllers;
 
 import com.example.catalog.domain.dto.CreateTaskDTO;
+import com.example.catalog.domain.dto.UpdateTaskDTO;
 import com.example.catalog.domain.entities.Task;
 import com.example.catalog.services.TaskService;
 import jakarta.validation.Valid;
@@ -37,6 +38,12 @@ public class TaskController {
     public ResponseEntity<Task> create(@RequestBody @Valid CreateTaskDTO dto) {
         Task saved = taskService.create(dto);
         return ResponseEntity.created(URI.create("/api/v1/tasks/" + saved.getId())).body(saved);
+    }
+
+    @PutMapping("/{id}/update")
+    public ResponseEntity<Task> updateTask(@PathVariable(name = "id") Long id, UpdateTaskDTO dto) {
+        Task taskUpdated = taskService.updateTask(id, dto);
+        return ResponseEntity.ok(taskUpdated);
     }
 
     @PutMapping("/{id}/toggle")

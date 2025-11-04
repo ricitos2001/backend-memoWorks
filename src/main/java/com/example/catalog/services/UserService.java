@@ -2,12 +2,14 @@ package com.example.catalog.services;
 
 import com.example.catalog.domain.dto.CreateTaskDTO;
 import com.example.catalog.domain.dto.CreateUserDTO;
+import com.example.catalog.domain.dto.UpdateUserDTO;
 import com.example.catalog.domain.entities.Task;
 import com.example.catalog.domain.entities.User;
 import com.example.catalog.repositories.TaskRepository;
 import com.example.catalog.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -31,13 +33,13 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
-    public User toggle(Long id) {
+    public User toggle(Long id, @RequestBody UpdateUserDTO dto) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
-        user.setName(user.getName());
-        user.setUsername(user.getUsername());
-        user.setPhoneNumber(user.getPhoneNumber());
-        user.setEmail(user.getEmail());
-        user.setPassword(user.getPassword());
+        user.setName(dto.name());
+        user.setUsername(dto.username());
+        user.setPhoneNumber(dto.phoneNumber());
+        user.setEmail(dto.email());
+        user.setPassword(dto.password());
         return user;
     }
 

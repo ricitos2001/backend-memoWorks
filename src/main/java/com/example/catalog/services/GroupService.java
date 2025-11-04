@@ -2,12 +2,14 @@ package com.example.catalog.services;
 
 import com.example.catalog.domain.dto.CreateGroupDTO;
 import com.example.catalog.domain.dto.CreateTaskDTO;
+import com.example.catalog.domain.dto.UpdateGroupDTO;
 import com.example.catalog.domain.entities.Group;
 import com.example.catalog.domain.entities.Task;
 import com.example.catalog.repositories.GroupRepository;
 import com.example.catalog.repositories.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -30,10 +32,10 @@ public class GroupService {
         return groupRepository.save(newGroup);
     }
 
-    public Group toggle(Long id) {
+    public Group toggle(Long id, @RequestBody UpdateGroupDTO dto) {
         Group group = groupRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Group not found"));
-        group.setAdminUser(group.getAdminUser());
-        group.setUsers(group.getUsers());
+        group.setAdminUser(dto.adminUser());
+        group.setUsers(dto.users());
         return group;
     }
 

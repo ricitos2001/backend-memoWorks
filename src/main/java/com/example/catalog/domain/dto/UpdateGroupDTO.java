@@ -4,7 +4,5 @@ import com.example.catalog.domain.entities.User;
 
 import java.util.List;
 
-public class CreateGroupDTO2 {
-    User adminUser;
-    List<User> users;
+public record UpdateGroupDTO(User adminUser, List<User> users) {
 }
