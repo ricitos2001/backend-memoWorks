@@ -1,6 +1,7 @@
 package com.example.catalog.domain.dto;
 
 import com.example.catalog.domain.entities.Task;
+import com.example.catalog.domain.enums.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,4 +18,5 @@ public class UserResponseDTO {
     private String email;
     private String password;
     private List<Task> tasks;
+    private Rol rol;
 }

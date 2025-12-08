@@ -1,6 +1,6 @@
 package com.example.catalog.domain.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.catalog.domain.enums.Rol;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,4 +33,7 @@ public class User {
     @OneToMany
     @JsonManagedReference
     private List<Task> tasks;
+
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
 }

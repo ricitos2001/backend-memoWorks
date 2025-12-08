@@ -1,6 +1,7 @@
 package com.example.catalog.domain.dto;
 
 import com.example.catalog.domain.entities.Task;
+import com.example.catalog.domain.enums.Rol;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -29,4 +30,5 @@ public class UserRequestDTO {
     private String password;
     @OneToMany
     private List<Task> tasks;
+    private Rol rol;
 }

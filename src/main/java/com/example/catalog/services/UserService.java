@@ -8,6 +8,7 @@ import com.example.catalog.web.exceptions.DuplicatedUserException;
 import com.example.catalog.web.exceptions.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +19,12 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) { this.userRepository = userRepository; }
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public Page<UserResponseDTO> list(Pageable pageable) {
         Page<UserResponseDTO> users = userRepository.findAll(pageable).map(UserMapper::toDTO);
@@ -54,6 +59,17 @@ public class UserService {
         }
     }
 
+    public User createUser(UserRequestDTO dto) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new DuplicatedUserException(dto.getUsername());
+        } else {
+            User user = UserMapper.toEntity(dto);
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            User savedUser = userRepository.save(user);
+            return savedUser;
+        }
+    }
+
     public UserResponseDTO update(Long id, @RequestBody UserRequestDTO dto) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
         updateBasicFields(dto, user);
@@ -69,6 +85,7 @@ public class UserService {
         Optional.ofNullable(user.getEmail()).ifPresent(updatedUser::setEmail);
         Optional.ofNullable(user.getPassword()).ifPresent(updatedUser::setPassword);
         Optional.ofNullable(user.getTasks()).ifPresent(updatedUser::setTasks);
+        Optional.ofNullable(user.getRol()).ifPresent(updatedUser::setRol);
     }
 
     public void delete(Long id) {
