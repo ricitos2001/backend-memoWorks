@@ -78,6 +78,7 @@ public class TaskService {
         Optional.ofNullable(task.getDate()).ifPresent(updatedTask::setDate);
         Optional.ofNullable(task.getAssigmentFor()).ifPresent(updatedTask::setAssigmentFor);
         Optional.ofNullable(task.getStatus()).ifPresent(updatedTask::setStatus);
+        Optional.ofNullable(task.getLabels()).ifPresent(updatedTask::setLabels);
     }
 
     public void delete(Long id) {

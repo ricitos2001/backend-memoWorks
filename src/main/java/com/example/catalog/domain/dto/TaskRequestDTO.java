@@ -1,6 +1,7 @@
 package com.example.catalog.domain.dto;
 
 import com.example.catalog.domain.entities.User;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -8,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,9 +23,11 @@ public class TaskRequestDTO {
     @Size(max=500, message = "la descripción no puede tener mas de 500 caracteres")
     private String description;
     @NotNull(message = "la fecha es obligatoria")
-    private Date date;
+    private LocalDateTime date;
     @NotNull(message = "es obligatorio asignar la tarea a un usuario")
     private User assigmentFor;
     @NotNull(message = "el status es obligatorio")
     private Boolean status;
+    @NotNull(message = "debes introducir una etiqueta como minimo")
+    private List<String> labels;
 }

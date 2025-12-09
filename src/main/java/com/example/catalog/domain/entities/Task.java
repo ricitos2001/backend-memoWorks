@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,7 +24,7 @@ public class Task {
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false)
@@ -30,5 +32,6 @@ public class Task {
     private User assigmentFor;
     @Column(nullable = false)
     private Boolean status;
-
+    @Column (nullable = false)
+    private List<String> labels;
 }

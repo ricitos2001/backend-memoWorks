@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,7 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtRequestFilter jwtRequestFilter;
@@ -43,20 +44,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/register", "/api/v1/auth/logout").permitAll()
-                        .requestMatchers("/groups/**").hasAnyRole("USUARIO") // Usuarios pueden gestionar préstamos
-                        .requestMatchers("/tasks/**").hasAnyRole("USUARIO") // General para ver libros
-                        .requestMatchers(("/users/**")).hasAnyRole("USUARIO") // General para ver autores
-                        .anyRequest().authenticated() // Requiere autenticación para otras rutas
+                        .requestMatchers("/groups/**").hasAnyRole("USUARIO")
+                        .requestMatchers("/tasks/**").hasAnyRole("USUARIO")
+                        .requestMatchers(("/users/**")).hasAnyRole("USUARIO")
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()) // Habilitar Basic Authentication
+                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless para JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Agregar filtro JWT
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
