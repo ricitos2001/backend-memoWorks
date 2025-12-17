@@ -1,5 +1,6 @@
 package com.example.catalog.web.exceptions;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,6 +34,16 @@ public class GlobalExceptionHandler {
         String msg = Objects.requireNonNullElse(ex.getMessage(), "Illegal argument");
         return ResponseEntity.badRequest().body(Map.of(
                 "error", "BAD_REQUEST",
+                "message", msg,
+                "timestamp", Instant.now().toString()
+        ));
+    }
+
+    @ExceptionHandler(DuplicatedUserException.class)
+    public ResponseEntity<Map<String, Object>> duplicatedUser(DuplicatedUserException ex) {
+        String msg = Objects.requireNonNullElse(ex.getMessage(), "User conflict");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "error", "CONFLICT",
                 "message", msg,
                 "timestamp", Instant.now().toString()
         ));

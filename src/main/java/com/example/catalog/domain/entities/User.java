@@ -19,15 +19,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String surnames;
     @Column(nullable = false, unique = true)
     private String username;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String phoneNumber;
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
     @OneToMany(mappedBy = "assigmentFor", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -1,7 +1,6 @@
 package com.example.catalog.segurity.controller;
 
 import com.example.catalog.domain.dto.UserRequestDTO;
-import com.example.catalog.domain.dto.UserResponseDTO;
 import com.example.catalog.domain.entities.User;
 import com.example.catalog.segurity.dto.AuthResponse;
 import com.example.catalog.segurity.dto.UserLoginDTO;
@@ -44,7 +43,7 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateToken((CustomUserDetails) authentication.getPrincipal(), userDetails.getId());
+        String token = jwtUtil.generateToken((CustomUserDetails) authentication.getPrincipal());
 
         Cookie jwtCookie = new Cookie("jwt", token);
         jwtCookie.setHttpOnly(true);
@@ -101,7 +100,7 @@ public class AuthController {
         User newUser = userService.createUser(dto);
 
         // Generar token JWT para el nuevo usuario
-        String token = jwtUtil.generateToken(new CustomUserDetails(newUser), newUser.getId());
+        String token = jwtUtil.generateToken(new CustomUserDetails(newUser));
 
         // Devolver el token en la respuesta
         return new AuthResponse(token);

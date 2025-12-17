@@ -1,6 +1,5 @@
 package com.example.catalog.repositories;
 
-import com.example.catalog.domain.dto.UserResponseDTO;
 import com.example.catalog.domain.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,13 +10,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
+    boolean existsByUsernameAndIdNot(String username, Long id);
+
     User getUserById(Long id);
 
     Optional<User> findUserByEmail(String email);
 
     User getUserByEmail(String email);
 
-    Optional<Object> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-    Optional<Object> findByUsername(String username);
+    Optional<User> findByUsername(String username);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
 }
