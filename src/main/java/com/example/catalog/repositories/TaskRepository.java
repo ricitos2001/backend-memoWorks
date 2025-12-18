@@ -16,5 +16,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     boolean existsByTitle(String title);
 
-    Page<Task> findByAssigmentForId(Long assigmentFor, Pageable pageable);
+    Page<Task> findByAssigmentForEmail(String assigmentFor, Pageable pageable);
 }

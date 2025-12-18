@@ -3,6 +3,7 @@ package com.example.catalog.web.controllers;
 import com.example.catalog.domain.dto.UserRequestDTO;
 import com.example.catalog.domain.dto.UserResponseDTO;
 import com.example.catalog.services.UserService;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 @RestController
@@ -76,5 +81,4 @@ public class UserControler {
         boolean exists = userService.existsByUsername(username);
         return ResponseEntity.ok(Map.of("exists", exists));
     }
-
 }

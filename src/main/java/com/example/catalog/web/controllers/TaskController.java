@@ -36,9 +36,9 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/myTasks/{id}")
-    public ResponseEntity<Page<TaskResponseDTO>> listByUserId(@PathVariable(name = "id") Long userId, Pageable pageable) {
-        Page<TaskResponseDTO> tasks = taskService.listByUserId(userId, pageable);
+    @GetMapping("/myTasks/{email}")
+    public ResponseEntity<Page<TaskResponseDTO>> listByUserEmail(@PathVariable(name = "email") String email, Pageable pageable) {
+        Page<TaskResponseDTO> tasks = taskService.listByUserEmail(email, pageable);
         return ResponseEntity.ok(tasks);
     }
 
