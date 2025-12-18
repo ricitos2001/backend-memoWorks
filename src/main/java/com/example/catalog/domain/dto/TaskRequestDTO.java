@@ -1,6 +1,7 @@
 package com.example.catalog.domain.dto;
 
 import com.example.catalog.domain.entities.User;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -31,4 +32,6 @@ public class TaskRequestDTO {
     private Boolean status;
     @NotNull(message = "debes introducir una etiqueta como minimo")
     private List<String> labels;
+    @Column(nullable = true)
+    private String image;
 }

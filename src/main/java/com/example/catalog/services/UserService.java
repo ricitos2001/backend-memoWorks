@@ -5,25 +5,35 @@ import com.example.catalog.domain.entities.User;
 import com.example.catalog.mappers.UserMapper;
 import com.example.catalog.repositories.UserRepository;
 import com.example.catalog.web.exceptions.DuplicatedUserException;
+import com.example.catalog.web.exceptions.ResourceNotFoundException;
 import com.example.catalog.web.exceptions.UserNotFoundException;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class UserService {
+    public static final String USUARIO_NO_ENCONTRADO_CON = "Usuario no encontrado con ";
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final FileService fileService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.fileService = fileService;
     }
 
     public Page<UserResponseDTO> list(Pageable pageable) {
@@ -109,6 +119,7 @@ public class UserService {
         Optional.ofNullable(user.getPassword()).ifPresent(updatedUser::setPassword);
         Optional.ofNullable(user.getTasks()).ifPresent(updatedUser::setTasks);
         Optional.ofNullable(user.getRol()).ifPresent(updatedUser::setRol);
+        Optional.ofNullable(user.getAvatar()).ifPresent(updatedUser::setAvatar);
     }
 
     public void delete(Long id) {
@@ -133,5 +144,55 @@ public class UserService {
             User savedUser = userRepository.save(user);
             return savedUser;
         }
+    }
+
+    /******************************************************************************************************/
+
+    public User obtenerMiPerfil() {
+        // Obtener contexto de autenticación actual
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Verificar si el usuario está autenticado
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResourceNotFoundException("Usuario no autenticado.");
+        }
+        String email = authentication.getName();
+        return userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(USUARIO_NO_ENCONTRADO_CON + "email " + email));
+    }
+
+    public Resource obtenerAvatarGenerico(Long id) {
+        User usuario = (id == null) ? obtenerMiPerfil() : obtenerUsuarioPorId(id);
+        if (usuario.getAvatar() == null || usuario.getAvatar().isEmpty()) {
+            throw new ResourceNotFoundException("El usuario no tiene un avatar asignado.");
+        }
+        return fileService.cargarFichero(usuario.getAvatar());
+    }
+
+    public void guardarAvatar(Long usuarioId, MultipartFile avatar) throws IOException {
+        validarTamanoArchivo(avatar);
+        validarTipoDeArchivo(avatar);
+        User usuario = userRepository.findById(usuarioId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
+        String rutaArchivo = fileService.guardarFichero(usuarioId, avatar);
+        usuario.setAvatar(rutaArchivo);
+        userRepository.save(usuario);
+    }
+
+    private void validarTamanoArchivo(MultipartFile avatar) {
+        long maxSizeInBytes = 1024 * 1024 * 5L; // 5MB
+        if (avatar.getSize() > maxSizeInBytes) {
+            throw new IllegalArgumentException("Tamaño de archivo excede el límite de 5MB");
+        }
+    }
+
+    private void validarTipoDeArchivo(MultipartFile avatar) {
+        String contentType = avatar.getContentType();
+        if (!Arrays.asList("image/png", "image/jpeg", "image/gif", "image/webp").contains(contentType)) {
+            throw new IllegalArgumentException("Tipo de archivo debe ser: (jpeg, png, gif, webp)");
+        }
+    }
+
+    public User obtenerUsuarioPorId(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(USUARIO_NO_ENCONTRADO_CON + "id " + id));
     }
 }

@@ -19,4 +19,6 @@ public class UserResponseDTO {
     private String password;
     private List<Task> tasks;
     private Rol rol;
+    private String avatar;
+
 }

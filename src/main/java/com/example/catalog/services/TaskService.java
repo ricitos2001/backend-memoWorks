@@ -8,24 +8,35 @@ import com.example.catalog.mappers.TaskMapper;
 import com.example.catalog.repositories.TaskRepository;
 import com.example.catalog.repositories.UserRepository;
 import com.example.catalog.web.exceptions.DuplicatedTaskException;
+import com.example.catalog.web.exceptions.ResourceNotFoundException;
 import com.example.catalog.web.exceptions.TaskNotFoundException;
 import com.example.catalog.web.exceptions.UserNotFoundException;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
 @Transactional
 public class TaskService {
+    public static final String TAREA_NO_ENCONTRADA_CON = "Usuario no encontrado con ";
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) { this.taskRepository = taskRepository;
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, FileService fileService) {
+        this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.fileService = fileService;
     }
 
     public Page<TaskResponseDTO> list(Pageable pageable) {
@@ -89,5 +100,43 @@ public class TaskService {
     public void delete(Long id) {
         if (!taskRepository.existsById(id)) throw new IllegalArgumentException("Task not found");
         taskRepository.deleteById(id);
+    }
+
+    /*************************************************************************************************************************************/
+
+    // FUNCIONES EN FASE DE PRUEBAS
+    public Resource obtenerAvatarGenerico(Long id) {
+        Task tarea = obtenerTareaPorId(id);
+        if (tarea.getImage() == null || tarea.getImage().isEmpty()) {
+            throw new ResourceNotFoundException("El usuario no tiene un avatar asignado.");
+        }
+        return fileService.cargarFichero(tarea.getImage());
+    }
+
+    public void guardarAvatar(Long usuarioId, MultipartFile avatar) throws IOException {
+        validarTamanoArchivo(avatar);
+        validarTipoDeArchivo(avatar);
+        User usuario = userRepository.findById(usuarioId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
+        String rutaArchivo = fileService.guardarFichero(usuarioId, avatar);
+        usuario.setAvatar(rutaArchivo);
+        userRepository.save(usuario);
+    }
+
+    private void validarTamanoArchivo(MultipartFile avatar) {
+        long maxSizeInBytes = 1024 * 1024 * 5L; // 5MB
+        if (avatar.getSize() > maxSizeInBytes) {
+            throw new IllegalArgumentException("Tamaño de archivo excede el límite de 5MB");
+        }
+    }
+
+    private void validarTipoDeArchivo(MultipartFile avatar) {
+        String contentType = avatar.getContentType();
+        if (!Arrays.asList("image/png", "image/jpeg", "image/gif", "image/webp").contains(contentType)) {
+            throw new IllegalArgumentException("Tipo de archivo debe ser: (jpeg, png, gif, webp)");
+        }
+    }
+
+    public Task obtenerTareaPorId(Long id) {
+        return taskRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(TAREA_NO_ENCONTRADA_CON + "id " + id));
     }
 }

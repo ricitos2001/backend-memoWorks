@@ -35,4 +35,6 @@ public class User {
     private List<Task> tasks;
     @Enumerated(EnumType.STRING)
     private Rol rol;
+    @Column(nullable = true)
+    private String avatar;
 }

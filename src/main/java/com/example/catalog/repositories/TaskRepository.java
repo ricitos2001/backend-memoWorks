@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByStatus(boolean status);
@@ -17,4 +18,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     boolean existsByTitle(String title);
 
     Page<Task> findByAssigmentForEmail(String assigmentFor, Pageable pageable);
+
+    Optional<Object> findTaskByTitle(String title);
 }

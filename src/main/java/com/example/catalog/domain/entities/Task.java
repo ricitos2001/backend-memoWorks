@@ -36,4 +36,6 @@ public class Task {
     @Column (nullable = false)
     @ElementCollection
     private List<String> labels;
+    @Column(nullable = true)
+    private String image;
 }

@@ -19,4 +19,5 @@ public class TaskResponseDTO {
     private User assigmentFor;
     private Boolean status;
     private List<String> labels;
+    private String image;
 }

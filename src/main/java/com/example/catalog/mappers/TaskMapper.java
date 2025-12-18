@@ -14,6 +14,7 @@ public class TaskMapper {
         task.setAssigmentFor(dto.getAssigmentFor());
         task.setStatus(dto.getStatus());
         task.setLabels(dto.getLabels());
+        task.setImage(dto.getImage());
         return task;
     }
 
@@ -26,7 +27,8 @@ public class TaskMapper {
                task.getTime(),
                task.getAssigmentFor(),
                task.getStatus(),
-               task.getLabels()
+               task.getLabels(),
+               task.getImage()
        );
     }
 }

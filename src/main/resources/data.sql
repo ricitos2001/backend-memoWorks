@@ -1,6 +1,6 @@
-INSERT INTO users (id, name, surnames, username, phone_number, email, password, rol)
+INSERT INTO users (id, name, surnames, username, phone_number, email, password, rol, avatar)
 VALUES (1, 'usuario', 'usuario', 'usuario', '+34111111111', 'user@example.com', '$2a$10$OnYIEcds5O4V.c5pYMm8GuLncbMQGEIl4Upb0k3vFgTg2nD894vXq' ||
-                                                                                '', 'USUARIO');
+                                                                                '', 'USUARIO', '');
 
 INSERT INTO tasks (id, title, description, date, time, user_id, status)
 VALUES
