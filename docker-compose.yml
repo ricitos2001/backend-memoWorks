@@ -3,6 +3,7 @@ version: "3.9"
 services:
   memoWorks:
     image: mysql:8.0
+    container_name: memoworks
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: memoWorks
