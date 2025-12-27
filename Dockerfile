@@ -4,12 +4,12 @@ WORKDIR /usr/src/app
 ARG NODE_ENV
 ARG PORT
 
-ENV PGHOST=${PGHOST}
-ENV MYSQLPORT=${PGPORT}
-ENV PGDATABASE=${PGDATABASE}
-ENV PGLUSER=${PGLUSER}
-ENV PGPASSWORD=${PGPASSWORD}
-ENV PORT=${PORT}
+ENV PGHOST=""
+ENV PGPORT=""
+ENV PGDATABASE=""
+ENV PGUSER=""
+ENV PGPASSWORD=""
+ENV PORT=8080
 
 COPY pom.xml .
 COPY src ./src
@@ -18,5 +18,5 @@ RUN mvn -B -DskipTests package
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=builder /usr/src/app/target/MemoWorks-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8080
+EXPOSE ${PORT}
 ENTRYPOINT ["java","-Xms256m","-Xmx512m","-XX:+UseG1GC","-jar","/app/app.jar"]
