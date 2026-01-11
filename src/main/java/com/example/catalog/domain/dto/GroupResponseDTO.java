@@ -11,6 +11,7 @@ import java.util.List;
 public class GroupResponseDTO {
     private Long id;
     private String name;
+    private String description;
     private User adminUser;
     private List<User> users;
 }

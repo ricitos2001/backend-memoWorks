@@ -73,6 +73,7 @@ public class GroupService {
 
     private void updateBasicFields(GroupRequestDTO group, Group updatedGroup) {
         Optional.ofNullable(group.getName()).ifPresent(updatedGroup::setName);
+        Optional.ofNullable(group.getDescription()).ifPresent(updatedGroup::setDescription);
         Optional.ofNullable(group.getAdminUser()).ifPresent(updatedGroup::setAdminUser);
         Optional.ofNullable(group.getUsers()).ifPresent(updatedGroup::setUsers);
     }

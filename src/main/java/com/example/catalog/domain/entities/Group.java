@@ -19,6 +19,8 @@ public class Group {
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
+    @Column(nullable = false, unique = true)
+    private String description;
     //@JoinColumn(nullable = false, unique = true)
     @OneToOne
     private User adminUser;
