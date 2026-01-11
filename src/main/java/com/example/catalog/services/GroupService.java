@@ -4,6 +4,7 @@ import com.example.catalog.domain.dto.*;
 import com.example.catalog.domain.entities.Group;
 import com.example.catalog.domain.entities.User;
 import com.example.catalog.mappers.GroupMapper;
+import com.example.catalog.mappers.TaskMapper;
 import com.example.catalog.repositories.GroupRepository;
 import com.example.catalog.repositories.UserRepository;
 import com.example.catalog.web.exceptions.DuplicatedGroupException;
@@ -30,6 +31,10 @@ public class GroupService {
     public Page<GroupResponseDTO> list(Pageable pageable) {
         Page<GroupResponseDTO> groups = groupRepository.findAll(pageable).map(GroupMapper::toDTO);
         return groups;
+    }
+
+    public Page<GroupResponseDTO> listByUserEmail(String email, Pageable pageable) {
+        return groupRepository.findByAdminUserEmail(email, pageable).map(GroupMapper::toDTO);
     }
 
     public GroupResponseDTO showById(Long id) {

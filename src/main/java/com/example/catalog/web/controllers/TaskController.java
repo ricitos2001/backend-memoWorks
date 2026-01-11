@@ -49,7 +49,7 @@ public class TaskController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<TaskResponseDTO> bookById(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<TaskResponseDTO> getById(@PathVariable(name = "id") Long id) {
         TaskResponseDTO task = taskService.showById(id);
         return ResponseEntity.ok(task);
     }

@@ -2,6 +2,7 @@ package com.example.catalog.web.controllers;
 
 import com.example.catalog.domain.dto.GroupRequestDTO;
 import com.example.catalog.domain.dto.GroupResponseDTO;
+import com.example.catalog.domain.dto.TaskResponseDTO;
 import com.example.catalog.services.GroupService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -30,14 +31,20 @@ public class GroupControler {
         return ResponseEntity.ok(groups);
     }
 
+    @GetMapping("/myGroups/{email}")
+    public ResponseEntity<Page<GroupResponseDTO>> listByUserEmail(@PathVariable(name = "email") String email, Pageable pageable) {
+        Page<GroupResponseDTO> groups = groupService.listByUserEmail(email, pageable);
+        return ResponseEntity.ok(groups);
+    }
+
     @GetMapping("/id/{id}")
-    public ResponseEntity<GroupResponseDTO> bookById(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<GroupResponseDTO> getById(@PathVariable(name = "id") Long id) {
         GroupResponseDTO group = groupService.showById(id);
         return ResponseEntity.ok(group);
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<GroupResponseDTO> bookById(@PathVariable(name = "name") String name) {
+    public ResponseEntity<GroupResponseDTO> getByName(@PathVariable(name = "name") String name) {
         GroupResponseDTO group = groupService.showByName(name);
         return ResponseEntity.ok(group);
     }
