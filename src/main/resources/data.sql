@@ -1,4 +1,4 @@
-DELETE FROM task_labels WHERE task_id = 1;
+/*DELETE FROM task_labels WHERE task_id = 1;
 DELETE FROM task_labels WHERE task_id = 2;
 DELETE FROM tasks WHERE id = 1;
 DELETE FROM tasks WHERE id = 2;
@@ -18,4 +18,4 @@ INSERT INTO task_labels (task_id, labels) VALUES
                                               (1, 'DWES'),
                                               (1, 'DIW'),
                                               (1, 'DAW'),
-                                              (2, 'DIW');
+                                              (2, 'DIW');*/
