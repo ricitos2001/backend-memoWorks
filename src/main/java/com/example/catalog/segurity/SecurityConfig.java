@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/groups/**").hasAnyRole("USUARIO")
                         .requestMatchers("/tasks/**").hasAnyRole("USUARIO")
                         .requestMatchers(("/users/**")).hasAnyRole("USUARIO")
+                        .requestMatchers(("/notifications/**")).hasAnyRole("USUARIO")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
