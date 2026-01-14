@@ -34,7 +34,7 @@ public class GroupService {
     }
 
     public Page<GroupResponseDTO> listByUserEmail(String email, Pageable pageable) {
-        return groupRepository.findByAdminUserEmail(email, pageable).map(GroupMapper::toDTO);
+        return groupRepository.findByAdminOrMemberEmail(email, pageable).map(GroupMapper::toDTO);
     }
 
     public GroupResponseDTO showById(Long id) {
