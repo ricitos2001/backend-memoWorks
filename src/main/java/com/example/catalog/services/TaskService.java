@@ -111,13 +111,13 @@ public class TaskService {
         return fileService.cargarFichero(tarea.getImage());
     }
 
-    public void guardarAvatar(Long usuarioId, MultipartFile avatar) throws IOException {
+    public void guardarAvatar(Long tareaId, MultipartFile avatar) throws IOException {
         validarTamanoArchivo(avatar);
         validarTipoDeArchivo(avatar);
-        User usuario = userRepository.findById(usuarioId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
-        String rutaArchivo = fileService.guardarFichero(usuarioId, avatar);
-        usuario.setAvatar(rutaArchivo);
-        userRepository.save(usuario);
+        Task tarea = taskRepository.findById(tareaId).orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada con id: " + tareaId));
+        String rutaArchivo = fileService.guardarFichero(tareaId, avatar);
+        tarea.setImage(rutaArchivo);
+        taskRepository.save(tarea);
     }
 
     private void validarTamanoArchivo(MultipartFile avatar) {
