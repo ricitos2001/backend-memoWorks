@@ -107,6 +107,7 @@ public class GroupService {
     }
 
     public void guardarAvatar(Long grupoId, MultipartFile avatar) throws IOException {
+        validarTamanoArchivo(avatar);
         validarTipoDeArchivo(avatar);
         User usuario = userRepository.findById(grupoId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + grupoId));
         String rutaArchivo = fileService.guardarFichero(grupoId, avatar);

@@ -112,6 +112,7 @@ public class TaskService {
     }
 
     public void guardarAvatar(Long usuarioId, MultipartFile avatar) throws IOException {
+        validarTamanoArchivo(avatar);
         validarTipoDeArchivo(avatar);
         User usuario = userRepository.findById(usuarioId).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
         String rutaArchivo = fileService.guardarFichero(usuarioId, avatar);
