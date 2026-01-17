@@ -43,9 +43,4 @@ public class NotificationService {
             return NotificationMapper.toDTO(savedNotification);
         }
     }
-
-    public void delete(Long id) {
-        if (!repository.existsById(id)) throw new IllegalArgumentException("Notification not found");
-        repository.deleteById(id);
-    }
 }

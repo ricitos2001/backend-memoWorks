@@ -43,11 +43,4 @@ public class NotificationController {
         NotificationResponseDTO saved = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a notification by ID", description = "Delete a notification using its unique ID.", parameters = {@Parameter(name = "id", description = "Notification ID")})
-    public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }
