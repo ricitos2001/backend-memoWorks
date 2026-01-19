@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/register", "/api/v1/auth/logout").permitAll()
+                        .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/register", "/api/v1/auth/logout", "/api/v1/auth/password/**").permitAll()
                         .requestMatchers("/api/v1/users/email-exists/**", "/api/v1/users/username-exists/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-ui/index.html").permitAll()
                         .requestMatchers("/api/v1/groups/**").hasAnyRole("USUARIO")
