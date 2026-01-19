@@ -1,5 +1,6 @@
 package com.example.catalog.services;
 
+import com.example.catalog.domain.dto.PasswordForgotRequestDTO;
 import com.example.catalog.domain.entities.PasswordResetToken;
 import com.example.catalog.domain.entities.User;
 import com.example.catalog.repositories.PasswordResetTokenRepository;
@@ -29,20 +30,15 @@ public class PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Value("${app.password-reset.token-expiration-minutes:60}")
     private long tokenExpirationMinutes;
 
-    @Value("${app.frontend.reset-url:http://localhost:4200/reset-password}")
-    private String frontendResetUrl;
-
-    public PasswordResetService(UserRepository userRepository, PasswordResetTokenRepository tokenRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public PasswordResetService(UserRepository userRepository, PasswordResetTokenRepository tokenRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService;
     }
 
     public void requestPasswordReset(String email) {
@@ -71,12 +67,9 @@ public class PasswordResetService {
 
         tokenRepository.save(token);
 
-        // Enviar correo real con enlace al frontend
-        String resetLink = String.format("%s?token=%s", frontendResetUrl, rawToken);
-        emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
-
-        // En dev: loggear también
-        logger.info("Password reset requested for user {}. Reset link: {}", user.getEmail(), resetLink);
+        // Enviar correo (en dev: loggear el token y link)
+        String resetLink = String.format("%s?token=%s", getFrontendResetUrl(), rawToken);
+        logger.info("Password reset requested for user {}. Reset link (DEV): {}", user.getEmail(), resetLink);
     }
 
     public boolean validateToken(String rawToken) {
@@ -119,7 +112,8 @@ public class PasswordResetService {
         byte[] random = new byte[24];
         secureRandom.nextBytes(random);
         String uuid = UUID.randomUUID().toString();
-        return uuid + Base64.getUrlEncoder().withoutPadding().encodeToString(random);
+        String combined = uuid + Base64.getUrlEncoder().withoutPadding().encodeToString(random);
+        return combined;
     }
 
     private String hash(String raw) {
@@ -131,4 +125,10 @@ public class PasswordResetService {
             throw new RuntimeException(e);
         }
     }
+
+    private String getFrontendResetUrl() {
+        // se puede leer de properties, por ahora usar valor por defecto
+        return "http://localhost:4200/reset-password";
+    }
 }
+
