@@ -17,7 +17,7 @@ public class UserResponseDTO {
     private String phoneNumber;
     private String email;
     private String password;
-    private List<Task> tasks;
+    private List<Long> tasksIds;
     private Rol rol;
     private String avatar;
     private List<Long> groupIds;

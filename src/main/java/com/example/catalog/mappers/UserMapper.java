@@ -3,6 +3,7 @@ package com.example.catalog.mappers;
 import com.example.catalog.domain.dto.UserRequestDTO;
 import com.example.catalog.domain.dto.UserResponseDTO;
 import com.example.catalog.domain.entities.Group;
+import com.example.catalog.domain.entities.Task;
 import com.example.catalog.domain.entities.User;
 
 public class UserMapper {
@@ -30,7 +31,7 @@ public class UserMapper {
                 user.getPhoneNumber(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getTasks(),
+                user.getTasks().stream().map(Task::getId).toList(),
                 user.getRol(),
                 user.getAvatar(),
                 user.getGroups().stream().map(Group::getId).toList()
