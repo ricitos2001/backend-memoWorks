@@ -1,5 +1,6 @@
 package com.example.catalog.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +27,7 @@ public class Group {
     private User adminUser;
     @ManyToMany
     @JoinTable(name = "group_user", joinColumns = @JoinColumn(name = "group_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonManagedReference
+    @JsonIgnore
     private List<User> users;
     @Column(nullable = true)
     private String image;
