@@ -14,8 +14,6 @@ import com.example.catalog.web.exceptions.UserNotFoundException;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
+import com.example.catalog.services.email.EmailService;
 
 @Service
 @Transactional
@@ -32,11 +34,13 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final FileService fileService;
+    private final EmailService emailService;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, FileService fileService) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, FileService fileService, EmailService emailService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
+        this.emailService = emailService;
     }
 
     public Page<TaskResponseDTO> list(Pageable pageable) {
@@ -74,16 +78,58 @@ public class TaskService {
             Task task = TaskMapper.toEntity(dto);
             task.setAssigmentFor(user);
             Task savedTask = taskRepository.save(task);
+
+            try {
+                String subject = "Nueva tarea asignada: " + savedTask.getTitle();
+                Map<String, Object> model = new HashMap<>();
+                model.put("task", savedTask);
+                model.put("user", user);
+                emailService.sendTemplateEmail(user.getEmail(), subject, "task-created.html", model);
+            } catch (Exception e) {
+                String subject = "Nueva tarea asignada: " + savedTask.getTitle();
+                String text = "Te han asignado la tarea: " + savedTask.getTitle();
+                emailService.sendSimpleEmail(user.getEmail(), subject, text);
+            }
+
             return TaskMapper.toDTO(savedTask);
         }
     }
 
     public TaskResponseDTO update(Long id, @RequestBody TaskRequestDTO dto) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
-        User user = userRepository.findById(dto.getAssigmentFor().getId()).orElseThrow(() -> new UserNotFoundException(dto.getAssigmentFor().getId()));
-        task.setAssigmentFor(user);
+        User newUser = userRepository.findById(dto.getAssigmentFor().getId()).orElseThrow(() -> new UserNotFoundException(dto.getAssigmentFor().getId()));
+        User oldUser = task.getAssigmentFor();
+        task.setAssigmentFor(newUser);
         updateBasicFields(dto, task);
         Task updatedTask = taskRepository.save(task);
+
+        // notificar cambios: si el asignado cambió, notificar a nuevo y (opcional) al antiguo
+        try {
+            String subject = "Tarea actualizada: " + updatedTask.getTitle();
+            Map<String, Object> model = new HashMap<>();
+            model.put("task", updatedTask);
+            model.put("user", newUser);
+            emailService.sendTemplateEmail(newUser.getEmail(), subject, "task-updated.html", model);
+        } catch (Exception e) {
+            try {
+                String subject = "Tarea actualizada: " + updatedTask.getTitle();
+                String text = "La tarea ha sido actualizada: " + updatedTask.getTitle();
+                emailService.sendSimpleEmail(newUser.getEmail(), subject, text);
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
+
+        // if assignment changed, notify old user about unassignment
+        if (oldUser != null && !oldUser.getId().equals(newUser.getId())) {
+            try {
+                String subject = "Has sido desasignado de la tarea: " + updatedTask.getTitle();
+                emailService.sendSimpleEmail(oldUser.getEmail(), subject, "Ya no estás asignado a la tarea: " + updatedTask.getTitle());
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
+
         return TaskMapper.toDTO(updatedTask);
     }
 
@@ -99,8 +145,21 @@ public class TaskService {
     }
 
     public void delete(Long id) {
-        if (!taskRepository.existsById(id)) throw new IllegalArgumentException("Task not found");
+        Task tarea = taskRepository.findById(id).orElse(null);
+        if (tarea == null) throw new IllegalArgumentException("Task not found");
         taskRepository.deleteById(id);
+
+        // notificar al asignado sobre eliminación
+        try {
+            if (tarea.getAssigmentFor() != null) {
+                String subject = "Tarea eliminada: " + tarea.getTitle();
+                Map<String, Object> model = new HashMap<>();
+                model.put("task", tarea);
+                emailService.sendTemplateEmail(tarea.getAssigmentFor().getEmail(), subject, "task-deleted.html", model);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     public Resource obtenerAvatarGenerico(Long id) {

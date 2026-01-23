@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nueva tarea asignada</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width:600px; margin:20px auto; background:#fff; padding:20px; border-radius:8px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Se te ha asignado una nueva tarea</h2>
+    <p><strong th:text="${task.title}">Título</strong></p>
+    <p th:text="${task.description}">Descripción</p>
+    <p>Fecha: <span th:text="${task.date}">-</span> Hora: <span th:text="${task.time}">-</span></p>
+    <p>Asignada a: <span th:text="${user.name ?: user.username ?: user.email}">Usuario</span></p>
+    <p>Accede a tu panel para más detalles.</p>
+</div>
+</body>
+</html>

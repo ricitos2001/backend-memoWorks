@@ -20,7 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
+import com.example.catalog.services.email.EmailService;
 
 @Service
 @Transactional
@@ -29,11 +33,13 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final FileService fileService;
+    private final EmailService emailService;
 
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, FileService fileService) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository, FileService fileService, EmailService emailService) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
         this.fileService = fileService;
+        this.emailService = emailService;
     }
 
     public Page<GroupResponseDTO> list(Pageable pageable) {
@@ -71,6 +77,22 @@ public class GroupService {
             Group group = GroupMapper.toEntity(dto);
             group.setAdminUser(admin);
             Group savedGroup = groupRepository.save(group);
+
+            // notificar al admin
+            try {
+                String subject = "Nuevo grupo creado: " + savedGroup.getName();
+                Map<String, Object> model = new HashMap<>();
+                model.put("group", savedGroup);
+                model.put("user", admin);
+                emailService.sendTemplateEmail(admin.getEmail(), subject, "group-created.html", model);
+            } catch (Exception e) {
+                try {
+                    emailService.sendSimpleEmail(admin.getEmail(), "Nuevo grupo creado: " + savedGroup.getName(), "Se ha creado el grupo: " + savedGroup.getName());
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+
             return GroupMapper.toDTO(savedGroup);
         }
     }
@@ -81,6 +103,16 @@ public class GroupService {
         group.setAdminUser(admin);
         updateBasicFields(dto, group);
         Group updatedGroup = groupRepository.save(group);
+        // notificar al admin sobre actualización
+        try {
+            String subject = "Grupo actualizado: " + updatedGroup.getName();
+            Map<String, Object> model = new HashMap<>();
+            model.put("group", updatedGroup);
+            model.put("user", admin);
+            emailService.sendTemplateEmail(admin.getEmail(), subject, "group-updated.html", model);
+        } catch (Exception e) {
+            try { emailService.sendSimpleEmail(admin.getEmail(), "Grupo actualizado: " + updatedGroup.getName(), "El grupo ha sido actualizado: " + updatedGroup.getName()); } catch (Exception ex) { }
+        }
         return GroupMapper.toDTO(updatedGroup);
     }
 
@@ -95,7 +127,18 @@ public class GroupService {
 
     public void delete(Long id) {
         if (!groupRepository.existsById(id)) throw new IllegalArgumentException("Group not found");
+        Group grp = groupRepository.findById(id).orElse(null);
         groupRepository.deleteById(id);
+        if (grp != null) {
+            try {
+                String subject = "Grupo eliminado: " + grp.getName();
+                Map<String, Object> model = new HashMap<>();
+                model.put("group", grp);
+                emailService.sendTemplateEmail(grp.getAdminUser().getEmail(), subject, "group-deleted.html", model);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
     }
 
     public Resource obtenerAvatarGenerico(Long id) {

@@ -20,7 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+
+import com.example.catalog.services.email.EmailService;
 
 @Service
 @Transactional
@@ -29,11 +33,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
+    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, FileService fileService, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileService = fileService;
+        this.emailService = emailService;
     }
 
     public Page<UserResponseDTO> list(Pageable pageable) {
@@ -85,6 +91,23 @@ public class UserService {
         if (dto.getPassword() != null) user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         User savedUser = userRepository.save(user);
+
+        // Enviar correo de bienvenida/registro
+        try {
+            String subject = "Bienvenido a MemoWorks";
+            Map<String, Object> model = new HashMap<>();
+            model.put("user", savedUser);
+            emailService.sendTemplateEmail(savedUser.getEmail(), subject, "saludo.html", model);
+        } catch (Exception e) {
+            // fallback simple
+            try {
+                String subject = "Bienvenido a MemoWorks";
+                String text = "Gracias por registrarte en MemoWorks.";
+                emailService.sendSimpleEmail(savedUser.getEmail(), subject, text);
+            } catch (Exception ex) {
+            }
+        }
+
         return UserMapper.toDTO(savedUser);
     }
 
@@ -143,6 +166,21 @@ public class UserService {
             User user = UserMapper.toEntity(dto);
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
             User savedUser = userRepository.save(user);
+
+            // enviar correo de registro
+            try {
+                String subject = "Bienvenido a MemoWorks";
+                Map<String, Object> model = new HashMap<>();
+                model.put("user", savedUser);
+                emailService.sendTemplateEmail(savedUser.getEmail(), subject, "saludo.html", model);
+            } catch (Exception e) {
+                try {
+                    emailService.sendSimpleEmail(savedUser.getEmail(), "Bienvenido a MemoWorks", "Gracias por registrarte en MemoWorks.");
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+
             return savedUser;
         }
     }

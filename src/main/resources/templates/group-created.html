@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Grupo creado</title>
+    <style>body{font-family:Arial,sans-serif}.container{max-width:600px;margin:20px auto;background:#fff;padding:20px;border-radius:8px}</style>
+</head>
+<body>
+<div class="container">
+    <h2>Nuevo grupo creado</h2>
+    <p>Se ha creado el grupo <strong th:text="${group.name}">Nombre</strong>.</p>
+    <p>Administrador: <span th:text="${user.name ?: user.username ?: user.email}">Usuario</span></p>
+</div>
+</body>
+</html>
